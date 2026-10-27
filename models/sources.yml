@@ -24,3 +24,11 @@ sources:
         description: "Référentiel points de vente (on-prem)"
       - name: ref_calendrier
         description: "Calendrier tirages / jackpots / événements sportifs (on-prem)"
+
+  - name: dq
+    database: DEMOFDJ
+    schema: DQ
+    description: "Décisions des data stewards (table Iceberg hors dbt : sql/v2/06_quarantaine_retraitement.sql)"
+    tables:
+      - name: corrections_quarantaine
+        description: "Journal append-only des décisions sur les lignes en quarantaine"

@@ -1,4 +1,5 @@
--- Mouvements portefeuille : montants à virgule, statuts hétérogènes, doublons, moyens inconnus
+-- Mouvements portefeuille : montants à virgule, statuts hétérogènes, doublons, moyens inconnus.
+-- Décisions des data stewards appliquées avant les contrôles (cf. dq_decisions_actives).
 with parsed as (
     select
         transaction_id,
@@ -16,6 +17,19 @@ with parsed as (
         _file_row,
         _load_ts
     from {{ source('raw', 'wallet_transactions') }}
+),
+
+corrige as (
+    select
+        p.* exclude (montant_eur, moyen_paiement),
+        coalesce(iff(d.decision = 'CORRIGER', d.montant_corrige, null), p.montant_eur)                 as montant_eur,
+        coalesce(iff(d.decision = 'CORRIGER', upper(d.moyen_paiement_corrige), null), p.moyen_paiement) as moyen_paiement,
+        p.montant_eur                                                                                  as montant_eur_recu,
+        p.moyen_paiement                                                                               as moyen_paiement_recu,
+        d.decision                                                                                     as decision_steward
+    from parsed p
+    left join {{ ref('dq_decisions_actives') }} d
+        on d.source = 'WALLET' and d.cle_enregistrement = p.transaction_id
 )
 
 select
@@ -27,6 +41,7 @@ select
         when p.horodatage_operation is null then 'HORODATAGE_INVALIDE'
         when p.moyen_paiement not in ('CB', 'PAYPAL', 'VIREMENT_SEPA', 'APPLE_PAY', 'PROMO') then 'MOYEN_PAIEMENT_INCONNU'
         when rang_doublon > 1 then 'DOUBLON'
+        when p.decision_steward = 'REJET_DEFINITIF' then 'REJET_STEWARD'
     end                                                                                              as motif_rejet
-from parsed p
+from corrige p
 left join {{ ref('clients') }} c on c.account_id = p.account_id

@@ -82,4 +82,18 @@ models:
           - accepted_values:
               values: ['JSON_INVALIDE', 'COMPTE_INCONNU', 'CODE_PRODUIT_ABSENT', 'PRODUIT_INCONNU', 'MISE_NON_POSITIVE',
                        'HORODATAGE_INVALIDE', 'DOUBLON', 'MONTANT_INVALIDE', 'MOYEN_PAIEMENT_INCONNU', 'DATE_INVALIDE',
-                       'PDV_INCONNU', 'MONTANT_NEGATIF']
+                       'PDV_INCONNU', 'MONTANT_NEGATIF', 'REJET_STEWARD']
+      - name: statut_traitement
+        tests:
+          - accepted_values:
+              values: ['A_TRAITER', 'AUTO_RESORPTION', 'CORRIGE_TOUJOURS_REJETE', 'REJET_DEFINITIF', 'CLOS_DOUBLON']
+  - name: dq_decisions_actives
+    description: "Dernière décision steward par ligne en quarantaine (source : DQ.CORRECTIONS_QUARANTAINE)"
+    tests:
+      - fdj_unicite_combinee:
+          colonnes: ['source', 'cle_enregistrement']
+    columns:
+      - name: decision
+        tests:
+          - accepted_values:
+              values: ['CORRIGER', 'ACCEPTER_EN_L_ETAT', 'REJET_DEFINITIF']

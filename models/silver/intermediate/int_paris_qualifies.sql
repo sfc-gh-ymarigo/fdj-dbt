@@ -1,5 +1,7 @@
 -- Paris en ligne : parsing du JSON brut, normalisation des horodatages multi-formats,
 -- dédoublonnage et qualification (motif de rejet) de chaque événement.
+-- Les décisions des data stewards (dq_decisions_actives) sont appliquées AVANT les contrôles :
+-- une ligne corrigée repasse toutes les règles et rejoint SILVER si elle est désormais conforme.
 with src as (
     select
         raw_json,
@@ -41,6 +43,19 @@ parsed as (
         _file_row,
         _load_ts
     from src
+),
+
+corrige as (
+    select
+        p.* exclude (code_produit, mise_eur),
+        coalesce(iff(d.decision = 'CORRIGER', d.code_produit_corrige, null), p.code_produit) as code_produit,
+        coalesce(iff(d.decision = 'CORRIGER', d.montant_corrige, null), p.mise_eur)          as mise_eur,
+        p.code_produit                                                                       as code_produit_recu,
+        p.mise_eur                                                                           as mise_eur_recue,
+        d.decision                                                                           as decision_steward
+    from parsed p
+    left join {{ ref('dq_decisions_actives') }} d
+        on d.source = 'PARIS_EN_LIGNE' and d.cle_enregistrement = p.bet_id
 )
 
 select
@@ -58,8 +73,9 @@ select
         when p.mise_eur is null or p.mise_eur <= 0 then 'MISE_NON_POSITIVE'
         when p.horodatage_pari is null then 'HORODATAGE_INVALIDE'
         when rang_doublon > 1 then 'DOUBLON'
+        when p.decision_steward = 'REJET_DEFINITIF' then 'REJET_STEWARD'
     end                                             as motif_rejet,
     r.famille
-from parsed p
+from corrige p
 left join {{ ref('clients') }} c on c.account_id = p.account_id
 left join {{ ref('ref_produits') }} r on r.code_produit = p.code_produit
