@@ -1,0 +1,35 @@
+name: fdj_rfp
+version: "1.0.0"
+config-version: 2
+profile: fdj_rfp
+
+model-paths: ["models"]
+macro-paths: ["macros"]
+test-paths: ["tests"]
+
+# Toutes les tables produites sont des tables Iceberg gérées par Snowflake sur volumes externes :
+# aucun stockage natif. SILVER / GOLD = Dynamic Iceberg Tables (rafraîchissement incrémental déclaratif).
+models:
+  fdj_rfp:
+    +materialized: dynamic_table
+    +snowflake_warehouse: FDJ_WH
+    +table_format: iceberg
+    +external_volume: ICEBERG_AWS_VOLUME
+    +base_location_root: fdj
+    +refresh_mode: AUTO
+    +target_lag: DOWNSTREAM
+    silver:
+      +schema: SILVER
+      quarantine:
+        +schema: DQ
+        +external_volume: ICEBERG_SILO_VOLUME
+    gold:
+      +schema: GOLD
+      +target_lag: "1 hour"
+    ml:
+      +schema: ML
+      +target_lag: "1 day"
+    # Données RÉELLES publiées (documents publics FDJ United) : isolées des données synthétiques
+    docs:
+      +schema: DOCS
+      +materialized: table

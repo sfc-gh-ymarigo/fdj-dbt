@@ -1,0 +1,12 @@
+fdj_rfp:
+  target: prod
+  outputs:
+    prod:
+      type: snowflake
+      account: "not needed"
+      user: "not needed"
+      role: ACCOUNTADMIN
+      database: DEMOFDJ
+      schema: SILVER
+      warehouse: FDJ_WH
+      threads: 8

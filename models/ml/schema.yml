@@ -1,0 +1,24 @@
+version: 2
+
+models:
+  - name: feat_joueur_snapshot
+    description: "Features joueur à date d'observation (14 j) - source des feature views externes du Feature Store"
+    tests:
+      - fdj_unicite_combinee:
+          arguments:
+            colonnes: ['account_id', 'snapshot_date']
+  - name: labels_joueur_snapshot
+    description: "Labels jeu à risque / churn à 30 jours (spine d'entraînement)"
+    columns:
+      - name: label_risque_jeu_30j
+        tests:
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+                quote: false
+      - name: label_churn_30j
+        tests:
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+                quote: false

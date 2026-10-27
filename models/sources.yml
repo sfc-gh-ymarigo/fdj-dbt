@@ -1,0 +1,26 @@
+version: 2
+
+sources:
+  - name: raw
+    database: DEMOFDJ
+    schema: RAW
+    description: "Zone RAW Iceberg : données telles que reçues des systèmes sources"
+    tables:
+      - name: bets_events
+        description: "Passerelle digitale (S3) - événements de paris NDJSON brut"
+      - name: crm_interactions
+        description: "CRM / SAV (S3) - interactions NDJSON brut"
+      - name: wallet_transactions
+        description: "PSP (S3) - mouvements portefeuille CSV brut"
+      - name: pos_ventes
+        description: "Caisses PDV (S3) - ventes anonymes agrégées"
+      - name: kyc_clients
+        description: "KYC clients en ligne (on-prem) - PII, extractions full + deltas"
+      - name: ref_produits
+        description: "Référentiel produits (on-prem)"
+      - name: ref_canaux
+        description: "Référentiel canaux (on-prem)"
+      - name: ref_pdv
+        description: "Référentiel points de vente (on-prem)"
+      - name: ref_calendrier
+        description: "Calendrier tirages / jackpots / événements sportifs (on-prem)"

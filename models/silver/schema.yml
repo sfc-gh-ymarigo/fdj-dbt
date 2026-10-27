@@ -1,0 +1,94 @@
+version: 2
+
+models:
+  - name: clients
+    description: "Clients en ligne - vue courante (SCD2 résolu), PII. Volume on-prem."
+    columns:
+      - name: account_id
+        tests: [unique, not_null]
+      - name: email
+        tests:
+          - not_null
+      - name: statut_kyc
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['VALIDE', 'EN_ATTENTE']
+  - name: paris_en_ligne
+    description: "Paris en ligne valides : dédoublonnés, horodatages normalisés, conformes aux référentiels"
+    columns:
+      - name: bet_id
+        tests: [unique, not_null]
+      - name: account_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('clients')
+                field: account_id
+      - name: code_produit
+        tests:
+          - relationships:
+              arguments:
+                to: ref('ref_produits')
+                field: code_produit
+      - name: mise_eur
+        tests:
+          - fdj_valeur_positive
+      - name: canal
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['APP', 'WEB']
+  - name: wallet_operations
+    columns:
+      - name: transaction_id
+        tests: [unique, not_null]
+      - name: type_operation
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['DEPOT', 'RETRAIT', 'BONUS']
+      - name: statut
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['ACCEPTE', 'REFUSE_LIMITE', 'REFUSE_BANQUE', 'EN_ATTENTE']
+      - name: montant_eur
+        tests:
+          - fdj_valeur_positive
+  - name: ventes_pdv
+    columns:
+      - name: id_pdv
+        tests:
+          - relationships:
+              arguments:
+                to: ref('ref_pdv')
+                field: pdv_id
+      - name: montant_ventes_eur
+        tests:
+          - not_null
+  - name: interactions_crm
+    columns:
+      - name: interaction_id
+        tests: [unique, not_null]
+  - name: ref_produits
+    columns:
+      - name: code_produit
+        tests: [unique, not_null]
+      - name: famille
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['TIRAGE', 'GRATTAGE', 'PARIS_SPORTIFS', 'PARIS_HIPPIQUES']
+  - name: dq_quarantaine
+    description: "Enregistrements rejetés avec motif (schéma DQ, volume on-prem)"
+    columns:
+      - name: motif_rejet
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['JSON_INVALIDE', 'COMPTE_INCONNU', 'CODE_PRODUIT_ABSENT', 'PRODUIT_INCONNU', 'MISE_NON_POSITIVE',
+                         'HORODATAGE_INVALIDE', 'DOUBLON', 'MONTANT_INVALIDE', 'MOYEN_PAIEMENT_INCONNU', 'DATE_INVALIDE',
+                         'PDV_INCONNU', 'MONTANT_NEGATIF']
