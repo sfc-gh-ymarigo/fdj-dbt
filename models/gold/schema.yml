@@ -8,14 +8,12 @@ models:
         tests:
           - not_null
           - accepted_values:
-              arguments:
-                values: ['LOTERIE_RESEAU_FRANCE', 'PARIS_JEUX_EN_LIGNE']
+              values: ['LOTERIE_RESEAU_FRANCE', 'PARIS_JEUX_EN_LIGNE']
   - name: fct_joueur_quotidien
     description: "Joueur x jour : paris, portefeuille, CRM - socle des features ML"
     tests:
       - fdj_unicite_combinee:
-          arguments:
-            colonnes: ['account_id', 'date_activite']
+          colonnes: ['account_id', 'date_activite']
   - name: dim_joueur_360
     description: "Player 360 des joueurs en ligne"
     columns:

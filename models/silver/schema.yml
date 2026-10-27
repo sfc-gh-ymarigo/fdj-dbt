@@ -12,8 +12,7 @@ models:
       - name: statut_kyc
         tests:
           - accepted_values:
-              arguments:
-                values: ['VALIDE', 'EN_ATTENTE']
+              values: ['VALIDE', 'EN_ATTENTE']
   - name: paris_en_ligne
     description: "Paris en ligne valides : dédoublonnés, horodatages normalisés, conformes aux référentiels"
     columns:
@@ -23,23 +22,20 @@ models:
         tests:
           - not_null
           - relationships:
-              arguments:
-                to: ref('clients')
-                field: account_id
+              to: ref('clients')
+              field: account_id
       - name: code_produit
         tests:
           - relationships:
-              arguments:
-                to: ref('ref_produits')
-                field: code_produit
+              to: ref('ref_produits')
+              field: code_produit
       - name: mise_eur
         tests:
           - fdj_valeur_positive
       - name: canal
         tests:
           - accepted_values:
-              arguments:
-                values: ['APP', 'WEB']
+              values: ['APP', 'WEB']
   - name: wallet_operations
     columns:
       - name: transaction_id
@@ -47,13 +43,11 @@ models:
       - name: type_operation
         tests:
           - accepted_values:
-              arguments:
-                values: ['DEPOT', 'RETRAIT', 'BONUS']
+              values: ['DEPOT', 'RETRAIT', 'BONUS']
       - name: statut
         tests:
           - accepted_values:
-              arguments:
-                values: ['ACCEPTE', 'REFUSE_LIMITE', 'REFUSE_BANQUE', 'EN_ATTENTE']
+              values: ['ACCEPTE', 'REFUSE_LIMITE', 'REFUSE_BANQUE', 'EN_ATTENTE']
       - name: montant_eur
         tests:
           - fdj_valeur_positive
@@ -62,9 +56,8 @@ models:
       - name: id_pdv
         tests:
           - relationships:
-              arguments:
-                to: ref('ref_pdv')
-                field: pdv_id
+              to: ref('ref_pdv')
+              field: pdv_id
       - name: montant_ventes_eur
         tests:
           - not_null
@@ -79,8 +72,7 @@ models:
       - name: famille
         tests:
           - accepted_values:
-              arguments:
-                values: ['TIRAGE', 'GRATTAGE', 'PARIS_SPORTIFS', 'PARIS_HIPPIQUES']
+              values: ['TIRAGE', 'GRATTAGE', 'PARIS_SPORTIFS', 'PARIS_HIPPIQUES']
   - name: dq_quarantaine
     description: "Enregistrements rejetés avec motif (schéma DQ, volume on-prem)"
     columns:
@@ -88,7 +80,6 @@ models:
         tests:
           - not_null
           - accepted_values:
-              arguments:
-                values: ['JSON_INVALIDE', 'COMPTE_INCONNU', 'CODE_PRODUIT_ABSENT', 'PRODUIT_INCONNU', 'MISE_NON_POSITIVE',
-                         'HORODATAGE_INVALIDE', 'DOUBLON', 'MONTANT_INVALIDE', 'MOYEN_PAIEMENT_INCONNU', 'DATE_INVALIDE',
-                         'PDV_INCONNU', 'MONTANT_NEGATIF']
+              values: ['JSON_INVALIDE', 'COMPTE_INCONNU', 'CODE_PRODUIT_ABSENT', 'PRODUIT_INCONNU', 'MISE_NON_POSITIVE',
+                       'HORODATAGE_INVALIDE', 'DOUBLON', 'MONTANT_INVALIDE', 'MOYEN_PAIEMENT_INCONNU', 'DATE_INVALIDE',
+                       'PDV_INCONNU', 'MONTANT_NEGATIF']
